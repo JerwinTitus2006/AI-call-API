@@ -24,7 +24,7 @@ Real-time transcription · Speaker identification · Pain point extraction · AI
 ```bash
 # Edit the root .env file:
 # vendorsync/.env
-GROQ_API_KEY=your_groq_api_key_here   # Get free key at console.groq.com
+GROQ_API_KEY=your_openrouter_api_key_here   # Get key at openrouter.ai (supports OpenRouter, Groq, or xAI)
 ```
 
 ### 2. Backend Setup
@@ -54,7 +54,7 @@ Frontend runs at: http://localhost:5173
 
 - 🎙️ **Real-time transcription** via Web Speech API (Chrome required)
 - 👥 **Multi-participant** with WebRTC video/audio
-- 🤖 **AI analysis** via Groq (llama3-8b-8192) — pain points, sentiments, action items
+- 🤖 **AI analysis** via OpenRouter (`google/gemini-2.5-flash` by default), Groq, or xAI — pain points, sentiments, action items
 - 📹 **Recording** — saves webm to MongoDB GridFS
 - 📊 **5-tab reports** — Summary, Pain Points, Actions, Transcript, Recording
 - 🔗 **Guest join links** — no account required for guests
@@ -65,7 +65,7 @@ Frontend runs at: http://localhost:5173
 
 **Frontend**: React 18 + Vite + TailwindCSS + Socket.io-client + WebRTC  
 **Backend**: FastAPI + python-socketio + Motor (async MongoDB)  
-**AI**: Groq API (llama3-8b-8192)  
+**AI**: OpenRouter API (`google/gemini-2.5-flash`), Groq (`llama-3.3-70b-versatile`), or xAI (`grok-2-1212`)  
 **DB**: MongoDB + GridFS for recordings
 
 ---
@@ -78,7 +78,7 @@ MONGO_URI=mongodb://localhost:27017
 DB_NAME=vendorsync
 JWT_SECRET=your_super_secret_key
 JWT_EXPIRE_HOURS=72
-GROQ_API_KEY=your_groq_api_key_here
+GROQ_API_KEY=your_api_key_here          # Supports OpenRouter (sk-or-...), Groq, or xAI keys
 FRONTEND_URL=http://localhost:5173
 PORT=8000
 ```
@@ -125,11 +125,35 @@ VITE_APP_NAME=VendorSync
 
 ---
 
-## Getting a Groq API Key (Free)
+## Setting Up Your AI API Key
 
-1. Visit [console.groq.com](https://console.groq.com)
-2. Sign up with Google/GitHub
-3. Go to API Keys → Create key
-4. Paste in `vendorsync/.env` as `GROQ_API_KEY=...`
+VendorSync automatically detects your AI provider based on the prefix of the API key provided in the `GROQ_API_KEY` variable:
 
-Without a key, the app still works — it uses a built-in fallback analysis.
+### 1. OpenRouter (Recommended / Default)
+Routes requests to OpenRouter using **`google/gemini-2.5-flash`** for fast, high-quality, and cost-effective analysis.
+1. Visit [openrouter.ai](https://openrouter.ai) and sign up.
+2. Go to **Keys** and create a new API Key.
+3. Paste the key in `vendorsync/.env` (starts with `sk-or-`):
+   ```env
+   GROQ_API_KEY=sk-or-v1-your_openrouter_key_here
+   ```
+
+### 2. Groq
+Routes requests to Groq using **`llama-3.3-70b-versatile`**.
+1. Visit [console.groq.com](https://console.groq.com) and sign up.
+2. Go to **API Keys** and create a key.
+3. Paste the key in `vendorsync/.env`:
+   ```env
+   GROQ_API_KEY=gsk_your_groq_key_here
+   ```
+
+### 3. xAI
+Routes requests to xAI using **`grok-2-1212`** (with fallback to `grok-beta`).
+1. Visit [console.x.ai](https://console.x.ai) and sign up.
+2. Generate an API key.
+3. Paste the key in `vendorsync/.env` (starts with `xai-`):
+   ```env
+   GROQ_API_KEY=xai-your_xai_key_here
+   ```
+
+Without any key configured, the application automatically falls back to a built-in rule-based analysis.
